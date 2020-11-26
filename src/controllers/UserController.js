@@ -52,30 +52,35 @@ module.exports = {
             
         });
     },
-    async update_user(req,res){ 
-        const auth_user = auth_client_logged(req.body.email,req.body.atual)
-        console.log(auth_user); 
-        if(auth_user) {
-            var sql = "UPDATE seller SET password = ? WHERE (email = ?)";
-            var params = [req.body.password, req.body.email];
-            console.log("entrei aqui");
-
-            if(req.body.whatsapp){
-                sql = "UPDATE client SET name = ?, password = ?, whatsapp = ? WHERE (email = ?)";
-                params = [req.body.name, req.body.password, req.body.whatsapp,req.body.email];
+    update_user(req,res){ 
+        var sql2 = "SELECT id FROM seller WHERE (email = ?) AND (password = ?) ";
+        params = [req.body.email,req.body.atual]
+        db.get(sql2,params,(err,rows)=>{
+            if(!rows){
+                res.status(500).json({"error":"Email ou senha Incorreta"});
             }
-            await db.run(sql,params,(err,result)=>{
-                console.log(result);
-                if(err){
-                    res.status(500).json({"error":err.message});
-                }else{
-                    res.json({
-                        "message":"success",
-                    });
+            else{
+                var sql = "UPDATE seller SET password = ? WHERE (email = ?)";
+                var params = [req.body.password, req.body.email];
+    
+                if(req.body.whatsapp){
+                    sql = "UPDATE client SET name = ?, password = ?, whatsapp = ? WHERE (email = ?)";
+                    params = [req.body.name, req.body.password, req.body.whatsapp,req.body.email];
                 }
-            });
-        } else {
-            res.status(500).json({"error":"Email ou senha Incorreta"});
-        }   
+                db.run(sql,params,(err,result)=>{
+                    if(err){
+                        res.status(500).json({"error":err.message});
+                    }else{
+                        res.json({
+                            "message":"success",
+                        });
+                    }
+                });
+            }
+
+            
+        })
+        
+           
     }
 }

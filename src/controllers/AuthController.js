@@ -1,16 +1,20 @@
 const db = require('../database/connection');
 
-const auth_client_logged = (email,senha)=>{
-    var sql = "SELECT id FROM client WHERE (email = ?) AND (password = ?)";
-    const params = [email, senha]
-    console.log(params);
-    db.get(sql,params,(err,rows)=>{
-        if(rows !== undefined){
-            return true;
-        }else{
-            return false;
+const auth_client_logged = (email,password)=>{
+    var sql = "SELECT id FROM seller WHERE email = "+"'"+email+"'"+" AND password = "+"'"+password+"'";
+    var sql2 = "SELECT id FROM seller WHERE (email = ?) AND (password = ?) ";
+    params = [email,password]
+    db.get(sql2,params,(err,rows)=>{
+        console.log(rows)
+        if(!rows){
+            return false
         }
-    });
+        else{
+            return true;
+        }
+    })
+    
+
 }
 
 const auth_client = (email)=>{
